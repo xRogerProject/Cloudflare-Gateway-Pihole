@@ -1,0 +1,38 @@
+name: Keep Repo Active
+
+on:
+  schedule:
+    # 每個月的 1 號執行一次 (at 00:00 on day-of-month 1)
+    # 你可以調整這個排程，但一個月一次就足夠了
+    - cron: '0 0 1 * *'
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    # 授予 workflow 寫入 repository 的權限
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Keep repo active by touching a file
+        run: |
+          # 設定 Git 的使用者名稱和 Email
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # 更新或建立一個 keep-alive 檔案，並寫入當前時間
+          # 這樣可以確保每次都有內容變更，從而產生 commit
+          echo "Last keep-alive timestamp: $(date)" > .keep-alive
+          
+          # 將變更加入 Git
+          git add .keep-alive
+          
+          # 提交變更，如果沒有變更則不會報錯
+          # '[ci skip]' 是一個常見的慣例，用來告訴其他 CI/CD 系統跳過這個 commit
+          git commit -m "chore: Keep repository active [ci skip]" || echo "No changes to commit"
+          
+          # 推送到遠端倉庫
+          git push
