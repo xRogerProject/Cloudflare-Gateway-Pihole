@@ -5,6 +5,7 @@ on:
     # 每個月的 1 號執行一次 (at 00:00 on day-of-month 1)
     # 你可以調整這個排程，但一個月一次就足夠了
     - cron: '0 0 1 * *'
+  workflow_dispatch:
 
 jobs:
   keep-alive:
